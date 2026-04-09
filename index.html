@@ -29,6 +29,23 @@
         <!-- Fontes Premium -->
         <link rel="stylesheet" href="css/fonts.css">
         <script src="js/lucide.min.js"></script>
+        <!-- Meta Pixel Code -->
+        <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '970318455485876');
+        fbq('track', 'PageView');
+        </script>
+        <noscript><img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=970318455485876&ev=PageView&noscript=1"
+        /></noscript>
+        <!-- End Meta Pixel Code -->
         <!-- Schema Markup -->
         <script type="application/ld+json">
         {
@@ -878,6 +895,51 @@
 
         // 3. Initialize checkout view
         updateView();
+
+        // 6. Meta Pixel — ViewContent on page load
+        if (typeof fbq === 'function') {
+            fbq('track', 'ViewContent', {
+                content_name: 'LUME Bracelets Landing Page',
+                content_category: 'Pulseiras Inteligentes',
+                currency: 'BRL',
+                value: 49.90
+            });
+        }
+
+        // 7. Meta Pixel — track offer section view (AddToCart)
+        const ofertaSection = document.getElementById('oferta');
+        if (ofertaSection) {
+            const ofertaObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && typeof fbq === 'function') {
+                        fbq('track', 'AddToCart', {
+                            content_name: 'LUME Bracelets',
+                            content_category: 'Pulseiras Inteligentes',
+                            currency: 'BRL',
+                            value: 49.90
+                        });
+                        ofertaObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            ofertaObserver.observe(ofertaSection);
+        }
+
+        // 8. Meta Pixel — InitiateCheckout on checkout button click
+        const checkoutBtnPixel = document.getElementById('checkout-btn');
+        if (checkoutBtnPixel) {
+            checkoutBtnPixel.addEventListener('click', function() {
+                if (typeof fbq !== 'function') return;
+                const selected = document.querySelector('input[name="pacote"]:checked');
+                const isCombo = !selected || selected.value === 'combo';
+                fbq('track', 'InitiateCheckout', {
+                    content_name: isCombo ? 'Combo Eterno' : 'Par LUME',
+                    currency: 'BRL',
+                    value: isCombo ? 49.90 : 29.90,
+                    num_items: 1
+                });
+            });
+        }
 
         // 4. Mobile CTA toggle
         toggleMobileCta();
